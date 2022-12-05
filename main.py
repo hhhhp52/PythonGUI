@@ -10,17 +10,17 @@ def _create_tk():
     return window
 
 
-def _layout_tk():
+def _init_layout_tk():
     func = GUIFunc()
-    test_button_1 = tkinter.Button(text="Welcome", command=func.print_welcome)
-
+    welcome_button = tkinter.Button(text="Welcome", command=func.print_welcome)
+    reset_button = tkinter.Button(text="Reset", command=func.reset_frame)
     # Layout: can use pack(relative)/grid(row)/place(absolute)
 
     # side = top/bottom/right/left
-    test_button_1.pack(side=cs.TOP)
-
-    test_button_2 = tkinter.Button(text="Test2")
-    test_button_2.place(x=200, y=200, anchor=cs.CENTER)
+    welcome_button.pack(side=cs.TOP)
+    reset_button.pack(side=cs.BOTTOM)
+    # test_button_2 = tkinter.Button(text="Test2")
+    # test_button_2.place(x=200, y=200, anchor=cs.CENTER)
 
     # Can't use grid, when using the pack
     # test_button_3 = tkinter.Button(text="Test3")
@@ -29,13 +29,23 @@ def _layout_tk():
 
 class GUIFunc:
 
-    @staticmethod
-    def print_welcome():
-        label = tkinter.Label(text="Hello, World")
-        label.pack(side=cs.TOP)
+    def __init__(self, frame=None):
+        self.frame = frame
+
+    def print_welcome(self):
+        if self.frame is None:
+            frame = tkinter.Frame(relief=cs.RIDGE, borderwidth=2, padx=2, pady=2, width=200, height=200)
+            frame.pack(anchor=cs.CENTER)
+            self.frame = frame
+            label = tkinter.Label(frame, text="Hello, World")
+            label.pack(side=cs.TOP)
+
+    def reset_frame(self):
+        self.frame.destroy()
+        self.frame = None
 
 
 if __name__ == '__main__':
     window = _create_tk()
-    _layout_tk()
+    _init_layout_tk()
     window.mainloop()
