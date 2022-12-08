@@ -3,8 +3,9 @@ import tkinter.constants as cs
 from tkinter import messagebox
 
 import constants
-from api import api
-from utils.helper import get_host_by_env
+from domain import domain
+from entity.user import user
+from util.helper import get_host_by_env
 
 
 class LoginGUIFunc:
@@ -69,24 +70,12 @@ class LoginGUIFunc:
         host = get_host_by_env(env)
 
         if host and account and password:
-            # For test:
-            flag = True
+            flag = domain.login_flow(host, account, password)
             if flag:
                 messagebox.showinfo("Success", "Login Success")
-                _init_homepage_layout(env, account, password)
+                _init_homepage_layout(env, account)
             else:
-                data = dict(
-                    account=account,
-                    password=password
-                )
-
-                flag, message, data = api.login(host, data)
-                if flag:
-                    messagebox.showinfo("Success", "Login Success")
-                    _init_homepage_layout(env, account, password)
-                else:
-                    messagebox.showerror("Failed", "Login Failed")
-
+                messagebox.showerror("Failed", "Login Failed")
         else:
             messagebox.showerror("Failed", "Login Failed")
 
@@ -117,8 +106,13 @@ class HomePageGUIFunc:
         account_label.grid(row=0, column=2)
         account_show_label = tk.Label(homepage_frame, text=self.account)
         account_show_label.grid(row=0, column=3)
-
-        content_label = tk.Label(homepage_frame, text="Hi, {account}, Welcome to generator".format(account=self.account))
+        content_label = tk.Label(
+            homepage_frame,
+            text="Hi, {first_name} {last_name}, Welcome to generator".format(
+                first_name=user.first_name,
+                last_name=user.last_name
+            )
+        )
         content_label.grid(row=1, column=3)
 
         logout_button = tk.Button(homepage_frame, text="Logout", command=self.logout)
@@ -133,7 +127,9 @@ class HomePageGUIFunc:
         self.homepage_frame = None
         self.homepage_layout_init()
 
-    def logout(self):
+    @staticmethod
+    def logout():
+        user.reset_user()
         _init_login_layout()
 
     def destroy_homepage_layout(self):
@@ -155,9 +151,8 @@ def _create_tk():
     return app
 
 
-def _init_homepage_layout(env, account, password):
+def _init_homepage_layout(env, account):
     login_gui_func.destroy_login_layout()
-    print(env, account, password)
     homepage_gui_func.env = env
     homepage_gui_func.account = account
     homepage_gui_func.homepage_layout_init()
