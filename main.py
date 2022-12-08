@@ -95,17 +95,20 @@ class HomePageGUIFunc:
         self.homepage_frame = None
         self.env = env
         self.account = account
+        # func button frame
+        self.glucose_frame = None
+        self.bp_frame = None
 
     def homepage_layout_init(self):
         homepage_frame = tk.Frame(relief=cs.RIDGE, borderwidth=2, padx=2, pady=2, width=400, height=400)
-        env_label = tk.Label(homepage_frame, text="Environment: ")
+        env_label = tk.Label(homepage_frame, text="Environment: {env}".format(env=self.env))
         env_label.grid(row=0, column=0)
-        env_show_label = tk.Label(homepage_frame, text=self.env)
-        env_show_label.grid(row=0, column=1)
-        account_label = tk.Label(homepage_frame, text="Account: ")
-        account_label.grid(row=0, column=2)
-        account_show_label = tk.Label(homepage_frame, text=self.account)
-        account_show_label.grid(row=0, column=3)
+        account_label = tk.Label(homepage_frame, text="Account: {account}".format(account=self.account))
+        account_label.grid(row=0, column=1)
+        clear_button = tk.Button(homepage_frame, text="Clear", command=self.clear)
+        clear_button.grid(row=0, column=2)
+        logout_button = tk.Button(homepage_frame, text="Logout", command=self.logout)
+        logout_button.grid(row=0, column=3)
         content_label = tk.Label(
             homepage_frame,
             text="Hi, {first_name} {last_name}, Welcome to generator".format(
@@ -113,30 +116,113 @@ class HomePageGUIFunc:
                 last_name=user.last_name
             )
         )
-        content_label.grid(row=1, column=3)
-
-        logout_button = tk.Button(homepage_frame, text="Logout", command=self.logout)
-        logout_button.grid(row=2, column=0)
-        clear_button = tk.Button(homepage_frame, text="Clear", command=self.clear)
-        clear_button.grid(row=2, column=1)
+        content_label.grid(row=1, column=1)
+        generate_glucose_button = tk.Button(
+            homepage_frame,
+            text="Glucose Auto Generator",
+            command=self.glucose_generator_layout
+        )
+        generate_glucose_button.grid(row=2, column=0)
+        generate_bp_button = tk.Button(
+            homepage_frame,
+            text="BP Auto Generator",
+            command=self.bp_generator_layout
+        )
+        generate_bp_button.grid(row=2, column=1)
         homepage_frame.pack(anchor=cs.CENTER)
         self.homepage_frame = homepage_frame
 
     def clear(self):
         self.homepage_frame.destroy()
         self.homepage_frame = None
+        self.clear_func_frame()
         self.homepage_layout_init()
 
-    @staticmethod
-    def logout():
-        user.reset_user()
-        _init_login_layout()
+    def clear_func_frame(self):
+        if self.glucose_frame:
+            self.glucose_frame.destroy()
+            self.glucose_frame = None
+        if self.bp_frame:
+            self.bp_frame.destroy()
+            self.bp_frame = None
 
     def destroy_homepage_layout(self):
         self.homepage_frame.destroy()
         self.homepage_frame = None
         self.account = None
         self.env = None
+
+    def logout(self):
+        user.reset_user()
+        self.clear_func_frame()
+        _init_login_layout()
+
+    @staticmethod
+    def _time_choose_layout(frame):
+        time_choose_label = tk.Label(frame, text="請針對下方進行填寫")
+        time_choose_label.grid(row=1, column=0)
+        before_meal_breakfast_label = tk.Label(frame, text="早餐前")
+        before_meal_breakfast_label.grid(row=2, column=0)
+        before_meal_breakfast_entry = tk.Entry(frame)
+        before_meal_breakfast_entry.grid(row=2, column=1)
+        after_meal_breakfast_label = tk.Label(frame, text="早餐後")
+        after_meal_breakfast_label.grid(row=2, column=2)
+        after_meal_breakfast_entry = tk.Entry(frame)
+        after_meal_breakfast_entry.grid(row=2, column=3)
+        before_meal_lunch_label = tk.Label(frame, text="午餐前")
+        before_meal_lunch_label.grid(row=3, column=0)
+        before_meal_lunch_entry = tk.Entry(frame)
+        before_meal_lunch_entry.grid(row=3, column=1)
+        after_meal_lunch_label = tk.Label(frame, text="午餐後")
+        after_meal_lunch_label.grid(row=3, column=2)
+        after_meal_lunch_entry = tk.Entry(frame)
+        after_meal_lunch_entry.grid(row=3, column=3)
+        before_meal_dinner_label = tk.Label(frame, text="晚餐前")
+        before_meal_dinner_label.grid(row=4, column=0)
+        before_meal_dinner_entry = tk.Entry(frame)
+        before_meal_dinner_entry.grid(row=4, column=1)
+        after_meal_dinner_label = tk.Label(frame, text="晚餐後")
+        after_meal_dinner_label.grid(row=4, column=2)
+        after_meal_dinner_entry = tk.Entry(frame)
+        after_meal_dinner_entry.grid(row=4, column=3)
+        wakeup_label = tk.Label(frame, text="晨起")
+        wakeup_label.grid(row=5, column=0)
+        wakeup_entry = tk.Entry(frame)
+        wakeup_entry.grid(row=5, column=1)
+        bedtime_label = tk.Label(frame, text="就寢")
+        bedtime_label.grid(row=5, column=2)
+        bedtime_entry = tk.Entry(frame)
+        bedtime_entry.grid(row=5, column=3)
+        midnight_label = tk.Label(frame, text="半夜")
+        midnight_label.grid(row=6, column=0)
+        midnight_entry = tk.Entry(frame)
+        midnight_entry.grid(row=6, column=1)
+        other_label = tk.Label(frame, text="其他")
+        other_label.grid(row=6, column=2)
+        other_entry = tk.Entry(frame)
+        other_entry.grid(row=6, column=3)
+
+    def glucose_generator_layout(self):
+        self.clear_func_frame()
+        glucose_frame = tk.Frame(relief=cs.RIDGE, borderwidth=2, padx=2, pady=2, width=400, height=400)
+        glucose_title_label = tk.Label(glucose_frame, text="Glucose Generator")
+        glucose_title_label.grid(row=0, column=0)
+        time_choose_label = tk.Label(glucose_frame, text="請針對下方進行填寫")
+        time_choose_label.grid(row=1, column=0)
+        # row: start from 2 to end 6
+        self._time_choose_layout(glucose_frame)
+        glucose_frame.pack(side=cs.TOP)
+        self.glucose_frame = glucose_frame
+
+    def bp_generator_layout(self):
+        self.clear_func_frame()
+        bp_frame = tk.Frame(relief=cs.RIDGE, borderwidth=2, padx=2, pady=2, width=400, height=200)
+        bp_title_label = tk.Label(bp_frame, text="Bp Generator")
+        bp_title_label.grid(row=0, column=0)
+        # row: start from 1 to end 6
+        self._time_choose_layout(bp_frame)
+        bp_frame.pack(side=cs.TOP)
+        self.bp_frame = bp_frame
 
 
 login_gui_func = LoginGUIFunc()
@@ -146,7 +232,7 @@ homepage_gui_func = HomePageGUIFunc()
 def _create_tk():
     app = tk.Tk()
     app.title("Generator Beta")
-    app.geometry("720x480")  # width, height
+    app.geometry("1024x768")  # width, height
     app.resizable(False, False)
     return app
 
